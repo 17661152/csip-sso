@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.ServiceMapper">
+
+    <select id="countServicePerm" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            TIA_SERVICE A
+            INNER JOIN TIA_FUNC_PERM_SVC_REL B ON A.SERVICE_ID = B.SERVICE_ID
+            INNER JOIN TIA_FUNC_PERM C ON B.FUNC_PERM_ID = C.FUNC_PERM_ID
+        WHERE
+            C.IS_ENABLE = '1'
+        AND A.ACCESS_ADDRESS = #{accessAddress}
+        AND C.FUNC_PERM_ID IN (
+          SELECT
+             G.FUNC_PERM_ID
+          FROM
+             TIA_PAGE P,
+             TIA_FUNC_PERM G
+          WHERE
+              P.PAGE_ID = G.FUNC_PERM_ID
+          AND G.IS_ENABLE = '1'
+          AND P.ACCESS_ADDRESS = #{currentRoute}
+          UNION
+          SELECT
+            G.FUNC_PERM_ID
+          FROM
+            TIA_ELEMENT E,
+            TIA_FUNC_PERM G,
+            TIA_PAGE P,
+            TIA_FUNC_PERM K
+          WHERE
+              E.ELEMENT_ID = G.FUNC_PERM_ID
+          AND E.ELEMENT_ID = K.FUNC_PERM_ID
+          AND P.PAGE_ID = E.PAGE_ID
+          AND G.IS_ENABLE = '1'
+          AND K.IS_ENABLE = '1'
+          AND P.ACCESS_ADDRESS = #{currentRoute}
+        )
+        AND EXISTS (
+            SELECT
+                1
+            FROM
+                TIA_ROLE_FUNC_PERM_REL PR,
+                TIA_FUNC_PERM FP,
+                TIA_USER_ROLE_REL RR
+            WHERE
+                PR.ROLE_ID = RR.ROLE_ID
+            AND FP.FUNC_PERM_ID = PR.FUNC_PERM_ID
+            AND FP.FUNC_PERM_ID = C.FUNC_PERM_ID
+            AND FP.IS_ENABLE = '1'
+            AND RR.USER_ID = #{userId}
+        )
+    </select>
+
+    <select id="listServicePage" resultType="com.expect.csip.iam.domain.Service">
+        SELECT
+            S.SERVICE_ID,
+            S.NAME,
+            S.SERVICE_NAME,
+            S.ACCESS_ADDRESS,
+            S.IS_RECORD_ACCESS_LOG,
+            S.IS_WHITE,
+            S.DESCR,
+            S.CREATE_PERSON,
+            S.CREATE_TIME,
+            S.LAST_UPDATE_PERSON,
+            S.LAST_UPDATE_TIME
+        FROM
+            TIA_SERVICE S
+        WHERE
+            1 = 1
+        <if test="condition.name != null and condition.name != ''">
+            AND S.NAME LIKE CONCAT('%',#{condition.name},'%')
+        </if>
+        <if test="condition.serviceName != null and condition.serviceName != ''">
+            AND S.SERVICE_NAME LIKE CONCAT('%',#{condition.serviceName},'%')
+        </if>
+        <if test="condition.accessAddress != null and condition.accessAddress != ''">
+            AND S.ACCESS_ADDRESS LIKE CONCAT('%',#{condition.accessAddress},'%')
+        </if>
+        <if test="condition.isRecordAccessLog != null and condition.isRecordAccessLog != ''">
+            AND S.IS_RECORD_ACCESS_LOG = #{condition.isRecordAccessLog}
+        </if>
+        <if test="condition.isWhite != null and condition.isWhite != ''">
+            AND S.IS_WHITE = #{condition.isWhite}
+        </if>
+    </select>
+</mapper>

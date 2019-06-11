@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.PageMapper">
+
+    <select id="listPagePage" resultType="com.expect.csip.iam.domain.Page">
+        SELECT
+            P.COMPONENT,
+            P.ACCESS_ADDRESS,
+            P.IS_INTERNAL,
+            P.PAGE_ID,
+            P.CREATE_PERSON,
+            P.CREATE_TIME,
+            P.LAST_UPDATE_PERSON,
+            P.LAST_UPDATE_TIME,
+            F.FUNC_PERM_ID,
+            F.TYPE,
+            F.NAME,
+            F.SORT_NUMBER,
+            F.IS_ENABLE,
+            F.DESCR
+        FROM
+          TIA_PAGE P
+        INNER JOIN TIA_FUNC_PERM F ON P.PAGE_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '2'
+        <if test="condition.name != null and condition.name != ''">
+            AND F.NAME LIKE CONCAT('%',#{condition.name},'%')
+        </if>
+        <if test="condition.accessAddress != null and condition.accessAddress != ''">
+            AND P.ACCESS_ADDRESS LIKE CONCAT('%',#{condition.accessAddress},'%')
+        </if>
+        <if test="condition.isInternal != null and condition.isInternal != ''">
+            AND P.IS_INTERNAL = #{condition.isInternal}
+        </if>
+        <if test="condition.isEnable != null and condition.isEnable != ''">
+            AND F.IS_ENABLE = #{condition.isEnable}
+        </if>
+        ORDER BY F.CREATE_TIME DESC
+    </select>
+
+    <select id="listMenuPage" resultType="com.expect.csip.iam.domain.Page">
+        SELECT
+            P.COMPONENT,
+            P.ACCESS_ADDRESS,
+            P.IS_INTERNAL,
+            P.PAGE_ID,
+            P.CREATE_PERSON,
+            P.CREATE_TIME,
+            P.LAST_UPDATE_PERSON,
+            P.LAST_UPDATE_TIME,
+            F.FUNC_PERM_ID,
+            F.TYPE,
+            F.NAME,
+            F.SORT_NUMBER,
+            F.IS_ENABLE,
+            F.DESCR
+        FROM
+          TIA_PAGE P
+        INNER JOIN TIA_FUNC_PERM F ON P.PAGE_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '2'
+        <if test="menuIds != null and menuIds.size() > 0">
+            AND EXISTS(
+               SELECT
+                    1
+               FROM
+                  TIA_MENU_PAGE_REL TMPR
+               WHERE
+                  TMPR.PAGE_ID = P.PAGE_ID
+               AND TMPR.MENU_ID IN
+              <foreach collection="menuIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            )
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.RoleDataPermRelMapper">
+
+    <select id="listUserDataPerms" resultType="com.expect.csip.iam.domain.RoleDataPermRel">
+        SELECT
+            C.ROLE_ID,
+            C.DATA_PERM_ID,
+            C.DATA_PERM_VALUE_ID,
+            A.ACCESS_ADDRESS,
+            V.CONDITION_EXPRESSION
+        FROM
+            TIA_SERVICE A
+            INNER JOIN TIA_DATA_PERM B ON B.DATA_PERM_ID = A.SERVICE_ID
+            INNER JOIN TIA_ROLE_DATA_PERM_REL C ON C.DATA_PERM_ID = B.DATA_PERM_ID
+            INNER JOIN TIA_USER_ROLE_REL D ON D.ROLE_ID = C.ROLE_ID
+            INNER JOIN TIA_DATA_PERM_VALUE V ON V.DATA_PERM_ID = C.DATA_PERM_ID AND V.DATA_PERM_VALUE_ID = C.DATA_PERM_VALUE_ID
+        WHERE
+            B.IS_ENABLE = '1'
+            AND D.USER_ID = #{userId}
+            AND A.ACCESS_ADDRESS = #{accessAddress}
+        ORDER BY
+            V.DATA_PERM_ID DESC
+    </select>
+
+    <select id="listRoleDataPermRelByRoleId" resultType="com.expect.csip.iam.domain.RoleDataPermRel">
+        SELECT
+            R.ROLE_ID,
+            R.DATA_PERM_ID,
+            R.DATA_PERM_VALUE_ID
+        FROM
+            TIA_ROLE_DATA_PERM_REL R
+        WHERE
+            R.ROLE_ID = #{roleId}
+    </select>
+</mapper>

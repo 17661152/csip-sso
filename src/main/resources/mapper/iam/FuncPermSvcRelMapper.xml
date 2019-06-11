@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.FuncPermSvcRelMapper">
+
+
+    <select id="listFuncPermService" resultType="com.expect.csip.iam.domain.Service">
+        SELECT
+            S.SERVICE_ID,
+            S.NAME,
+            S.SERVICE_NAME,
+            S.ACCESS_ADDRESS,
+            S.IS_RECORD_ACCESS_LOG,
+            S.DESCR,
+            S.CREATE_PERSON,
+            S.CREATE_TIME,
+            S.LAST_UPDATE_PERSON,
+            S.LAST_UPDATE_TIME
+        FROM
+            TIA_SERVICE S
+        WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                TIA_FUNC_PERM_SVC_REL R
+            WHERE
+                R.SERVICE_ID = S.SERVICE_ID
+            AND R.FUNC_PERM_ID = #{funcPermId}
+        )
+    </select>
+</mapper>

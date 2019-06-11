@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.ElementMapper">
+
+    <select id="listElementPage" resultType="com.expect.csip.iam.domain.Element">
+        SELECT
+            E.ELEMENT_ID,
+            E.ELEMENT_CODE,
+            E.PAGE_ID,
+            E.CREATE_PERSON,
+            E.CREATE_TIME,
+            E.LAST_UPDATE_PERSON,
+            E.LAST_UPDATE_TIME,
+            F.FUNC_PERM_ID,
+            F.TYPE,
+            F.NAME,
+            F.SORT_NUMBER,
+            F.IS_ENABLE,
+            F.DESCR,
+            P.NAME PAGE_NAME
+        FROM
+            TIA_ELEMENT E
+        INNER JOIN TIA_FUNC_PERM F ON E.ELEMENT_ID = F.FUNC_PERM_ID
+        INNER JOIN TIA_FUNC_PERM P ON E.PAGE_ID = P.FUNC_PERM_ID AND P.TYPE = '2'
+        WHERE
+          F.TYPE = '3'
+        <if test="condition.name != null and condition.name != ''">
+            AND F.NAME LIKE CONCAT('%',#{condition.name},'%')
+        </if>
+        <if test="condition.elementCode != null and condition.elementCode != ''">
+            AND E.ELEMENT_CODE LIKE CONCAT('%',#{condition.elementCode},'%')
+        </if>
+        <if test="condition.pageName != null and condition.pageName != ''">
+            AND P.NAME LIKE CONCAT('%',#{condition.pageName},'%')
+        </if>
+        <if test="condition.isEnable != null and condition.isEnable != ''">
+            AND F.IS_ENABLE = #{condition.isEnable}
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+
+    <select id="listAuthElement" resultType="com.expect.csip.iam.domain.Element">
+        SELECT
+          E.ELEMENT_ID,
+          E.ELEMENT_CODE,
+          E.PAGE_ID,
+          E.CREATE_PERSON,
+          E.CREATE_TIME,
+          E.LAST_UPDATE_PERSON,
+          E.LAST_UPDATE_TIME,
+          F.FUNC_PERM_ID,
+          F.TYPE,
+          F.NAME,
+          F.SORT_NUMBER,
+          F.IS_ENABLE,
+          F.DESCR
+        FROM
+          TIA_ELEMENT E
+        INNER JOIN TIA_FUNC_PERM F ON E.ELEMENT_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '3'
+        AND F.IS_ENABLE = '1'
+        <if test="userId != null and userId != ''">
+            AND EXISTS (
+                SELECT
+                  1
+                FROM
+                    TIA_USER_ROLE_REL URR,
+                    TIA_ROLE_FUNC_PERM_REL RFPR
+                WHERE
+                  URR.ROLE_ID = RFPR.ROLE_ID
+                AND RFPR.FUNC_PERM_ID = F.FUNC_PERM_ID
+                AND URR.USER_ID = #{userId}
+            )
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+</mapper>

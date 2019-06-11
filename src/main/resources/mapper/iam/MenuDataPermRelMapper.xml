@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.MenuDataPermRelMapper">
+
+    <select id="listMenuDataPerms" resultType="com.expect.csip.iam.domain.DataPerm">
+          SELECT
+            D.DATA_PERM_ID,
+            D.NAME,
+            D.SORT_NUMBER,
+            D.IS_ENABLE,
+            D.DESCR,
+            D.CREATE_PERSON,
+            D.CREATE_TIME,
+            D.LAST_UPDATE_PERSON,
+            D.LAST_UPDATE_TIME,
+            S.NAME SERVICE_NAME
+        FROM
+            TIA_DATA_PERM D
+        INNER JOIN TIA_SERVICE S ON S.SERVICE_ID = D.DATA_PERM_ID
+        WHERE
+          EXISTS (
+            SELECT 1 FROM TIA_MENU_DATA_PERM_REL R WHERE R.DATA_PERM_ID = D.DATA_PERM_ID AND R.MENU_ID = #{menuId}
+          )
+    </select>
+
+    <select id="listMenuDataPermValues" resultType="com.expect.csip.iam.domain.DataPermValue">
+        SELECT
+            V.DATA_PERM_VALUE_ID,
+            V.DATA_PERM_ID,
+            V.NAME,
+            V.CONDITION_EXPRESSION,
+            V.CREATE_PERSON,
+            V.CREATE_TIME,
+            V.LAST_UPDATE_PERSON,
+            V.LAST_UPDATE_TIME,
+            P.NAME DATA_PERM_NAME,
+            P.SORT_NUMBER,
+            P.IS_ENABLE,
+            P.DESCR
+        FROM
+            TIA_DATA_PERM P,
+            TIA_DATA_PERM_VALUE V
+        WHERE
+            P.DATA_PERM_ID = V.DATA_PERM_ID
+        AND P.IS_ENABLE = '1'
+        AND EXISTS(
+			SELECT
+				1
+			FROM
+				TIA_MENU_DATA_PERM_REL PR
+			WHERE
+				PR.DATA_PERM_ID = P.DATA_PERM_ID
+			AND PR.MENU_ID = #{menuId}
+		)
+    </select>
+</mapper>

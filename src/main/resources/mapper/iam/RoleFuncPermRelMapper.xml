@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.RoleFuncPermRelMapper">
+
+    <delete id="deleteRoleFuncPermMenuRelByRoleId">
+        DELETE
+          FPR
+        FROM
+          TIA_ROLE_FUNC_PERM_REL FPR
+        WHERE
+        EXISTS (
+            SELECT
+              1
+            FROM
+              TIA_FUNC_PERM FP
+            WHERE
+             FP.TYPE = '1'
+            AND FP.FUNC_PERM_ID = FPR.FUNC_PERM_ID
+        )
+        AND FPR.ROLE_ID = #{roleId}
+    </delete>
+
+    <select id="listRoleFuncPerms" resultType="com.expect.csip.iam.domain.RoleFuncPermRel">
+        SELECT
+            FPR.FUNC_PERM_ID,
+            FPR.ROLE_ID
+        FROM
+            TIA_ROLE_FUNC_PERM_REL FPR
+        WHERE
+         EXISTS (
+            SELECT
+                1
+            FROM
+                TIA_FUNC_PERM FP
+            WHERE
+                FP.FUNC_PERM_ID = FPR.FUNC_PERM_ID
+          )
+          AND FPR.ROLE_ID = #{roleId}
+          AND HALF_CHECKED = #{halfChecked}
+    </select>
+</mapper>

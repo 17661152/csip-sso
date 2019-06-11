@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.UserMapper">
+
+     <select id="listUserPage" resultType="com.expect.csip.iam.domain.User">
+          SELECT
+            U.USER_ID,
+            U.LOGIN_NAME,
+            U.ORGAN_ID,
+            U.NAME,
+            U.SORT_NUMBER,
+            U.STATUS,
+            U.TYPE,
+            U.AVATAR,
+            U.CREATE_PERSON,
+            U.CREATE_TIME,
+            U.LAST_UPDATE_PERSON,
+            U.LAST_UPDATE_TIME,
+            O.NAME ORGAN_NAME
+          FROM
+            TIA_USER U
+          LEFT JOIN TIA_ORGAN O ON U.ORGAN_ID = O.ORGAN_ID
+	      WHERE U.DELETE_FLAG = '1'
+	      <if test="condition.status != null and condition.status != ''">
+              AND U.STATUS = ${condition.status}
+          </if>
+         <if test="condition.loginName != null and condition.loginName != ''">
+             AND U.LOGIN_NAME LIKE  CONCAT('%',#{condition.loginName},'%')
+         </if>
+         <if test="condition.name != null and condition.name != ''">
+             AND U.NAME LIKE  CONCAT('%',#{condition.name},'%')
+         </if>
+     </select>
+
+     <select id="listUserRolePageByRoleId" resultType="com.expect.csip.iam.domain.User">
+         SELECT
+	        U.USER_ID,
+            U.LOGIN_NAME,
+            U.ORGAN_ID,
+            U.NAME,
+            U.SORT_NUMBER,
+            U.STATUS,
+            U.TYPE,
+            U.AVATAR,
+            U.CREATE_PERSON,
+            U.CREATE_TIME,
+            U.LAST_UPDATE_PERSON,
+            U.LAST_UPDATE_TIME,
+            U.DELETE_FLAG,
+            O.ORGAN_NAME
+        FROM
+	        TIA_USER U
+	    LEFT JOIN TIA_USER_ROLE_REL UR ON U.USER_ID = UR.USER_ID
+        LEFT JOIN TIA_ORGAN O ON U.ORGAN_ID = O.ID
+        WHERE
+	       UR.ROLE_ID = #{condition.roleId}
+	    AND U.DELETE_FLAG='1'
+     </select>
+</mapper>

@@ -1,0 +1,47 @@
+server:
+  port: 8100
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  redis:
+    host: 192.168.1.129
+    port: 6379
+    database: 0
+    redisson:
+      lock:
+        waitTime: 60
+        leaseTime: 60
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    locale: zh
+    time-zone: GMT+8
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://192.168.1.129:3306/csip_sso?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 30
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*Mapper.xml
+  typeAliasesPackage: com.expect.csip.**.domain
+  global-config:
+    db-config:
+      id-type: id_worker_str
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+      db-type: mysql
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+kisso:
+  config:
+    signkey: ABC123OBJEJ3H376G81
+    cookieCheckip: true
+    cookieBrowser: true

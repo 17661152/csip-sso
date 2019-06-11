@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.MenuMapper">
+
+    <select id="listAuthVueRouterMenu" resultType="com.expect.csip.iam.domain.Menu">
+        SELECT
+            P.COMPONENT,
+            P.ACCESS_ADDRESS,
+            P.IS_INTERNAL,
+            M.PAGE_ID,
+            M.MENU_ID,
+            M.MENU_CODE,
+            M.CODE_PATH,
+            M.ICON_ADDRESS,
+            M.TREE_LEVEL,
+            M.PARENT_MENU_ID,
+            M.LAYOUT,
+            M.CREATE_PERSON,
+            M.CREATE_TIME,
+            M.LAST_UPDATE_PERSON,
+            M.LAST_UPDATE_TIME,
+            F.FUNC_PERM_ID,
+            F.TYPE,
+            F.NAME,
+            F.SORT_NUMBER,
+            F.IS_ENABLE,
+            F.DESCR
+        FROM
+          TIA_MENU M
+        INNER JOIN TIA_FUNC_PERM F ON M.MENU_ID = F.FUNC_PERM_ID
+        LEFT JOIN (SELECT G.COMPONENT,G.ACCESS_ADDRESS,G.IS_INTERNAL,G.PAGE_ID,F.NAME FROM TIA_FUNC_PERM F,TIA_PAGE G WHERE F.FUNC_PERM_ID = G.PAGE_ID AND F.IS_ENABLE = '1' AND F.TYPE = '2') P ON P.PAGE_ID = M.PAGE_ID
+        WHERE
+            F.TYPE = '1'
+        AND F.IS_ENABLE = '1'
+        <if test="userId != null and userId != ''">
+            AND EXISTS (
+                SELECT
+                  1
+                FROM
+                    TIA_USER_ROLE_REL URR,
+                    TIA_ROLE_FUNC_PERM_REL RFPR
+                WHERE
+                    URR.ROLE_ID = RFPR.ROLE_ID
+                AND RFPR.FUNC_PERM_ID = F.FUNC_PERM_ID
+                AND URR.USER_ID = #{userId}
+            )
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+
+    <select id="listMenu" resultType="com.expect.csip.iam.domain.Menu">
+        SELECT
+            M.CODE_PATH,
+            M.PAGE_ID,
+            M.MENU_ID,
+            M.MENU_CODE,
+            M.ICON_ADDRESS,
+            M.TREE_LEVEL,
+            M.PARENT_MENU_ID,
+            M.LAYOUT,
+            M.CREATE_PERSON,
+            M.CREATE_TIME,
+            M.LAST_UPDATE_PERSON,
+            M.LAST_UPDATE_TIME,
+            F.FUNC_PERM_ID,
+            F.TYPE,
+            F.NAME,
+            F.SORT_NUMBER,
+            F.IS_ENABLE,
+            F.DESCR
+        FROM
+          TIA_MENU M
+        INNER JOIN TIA_FUNC_PERM F ON M.MENU_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '1'
+        <if test="parentMenuId != null">
+            AND M.PARENT_MENU_ID = #{parentMenuId}
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+
+    <select id="listMenuPage" resultType="com.expect.csip.iam.domain.Menu">
+        SELECT
+          M.PAGE_ID,
+          M.MENU_ID,
+          M.MENU_CODE,
+          M.ICON_ADDRESS,
+          M.TREE_LEVEL,
+          M.PARENT_MENU_ID,
+          M.LAYOUT,
+          M.CREATE_PERSON,
+          M.CREATE_TIME,
+          M.LAST_UPDATE_PERSON,
+          M.LAST_UPDATE_TIME,
+          F.FUNC_PERM_ID,
+          F.TYPE,
+          F.NAME,
+          F.SORT_NUMBER,
+          F.IS_ENABLE,
+          F.DESCR
+        FROM
+          TIA_MENU M
+        INNER JOIN TIA_FUNC_PERM F ON M.MENU_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '1'
+        <if test="condition.parentMenuId != null and condition.parentMenuId != ''">
+            AND M.PARENT_MENU_ID = #{condition.parentMenuId}
+        </if>
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+
+    <select id="listOneOrTwoMenu" resultType="com.expect.csip.iam.domain.Menu">
+        SELECT
+          M.PAGE_ID,
+          M.MENU_ID,
+          M.MENU_CODE,
+          M.ICON_ADDRESS,
+          M.TREE_LEVEL,
+          M.PARENT_MENU_ID,
+          M.LAYOUT,
+          M.CREATE_PERSON,
+          M.CREATE_TIME,
+          M.LAST_UPDATE_PERSON,
+          M.LAST_UPDATE_TIME,
+          F.FUNC_PERM_ID,
+          F.TYPE,
+          F.NAME,
+          F.SORT_NUMBER,
+          F.IS_ENABLE,
+          F.DESCR
+        FROM
+          TIA_MENU M
+          INNER JOIN TIA_FUNC_PERM F ON M.MENU_ID = F.FUNC_PERM_ID
+        WHERE
+          F.TYPE = '1'
+        AND M.TREE_LEVEL IN (0, 1)
+        ORDER BY F.SORT_NUMBER ASC
+    </select>
+
+    <select id="listFuncPerms" resultType="com.expect.common.domain.TreeNode">
+        SELECT
+            F.`KEY`,
+            F.PARENT_ID,
+            F.TITLE,
+            F.SORT_NUMBER
+        FROM
+            (
+            SELECT
+                M.MENU_ID `KEY`,
+                P.`NAME` TITLE,
+                M.PARENT_MENU_ID PARENT_ID,
+                P.SORT_NUMBER
+            FROM
+                TIA_MENU M,
+                TIA_FUNC_PERM P
+            WHERE
+                P.FUNC_PERM_ID = M.MENU_ID
+            UNION
+            SELECT
+                P.PAGE_ID `KEY`,
+                F.`NAME` TITLE,
+                R.MENU_ID PARENT_ID,
+                F.SORT_NUMBER
+            FROM
+                TIA_PAGE P,
+                TIA_FUNC_PERM F,
+                TIA_MENU_PAGE_REL R
+            WHERE
+                P.PAGE_ID = F.FUNC_PERM_ID
+            AND P.PAGE_ID = R.PAGE_ID
+            UNION
+            SELECT
+                E.ELEMENT_ID `KEY`,
+                P.`NAME` TITLE,
+                E.PAGE_ID PARENT_ID,
+                P.SORT_NUMBER
+            FROM
+                TIA_ELEMENT E,
+                TIA_FUNC_PERM P
+            WHERE
+                P.FUNC_PERM_ID = E.ELEMENT_ID
+          ) F
+          ORDER BY
+            F.SORT_NUMBER ASC
+    </select>
+</mapper>

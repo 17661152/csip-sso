@@ -1,0 +1,147 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- 继承自SpringBoot -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.4.RELEASE</version>
+	</parent>
+
+	<groupId>com.expect.csip</groupId>
+	<artifactId>csip-sso</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+
+	<name>csip-sso</name>
+	<url>http://maven.apache.org</url>
+	<description>
+		云集成平台单点登录系统
+	</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+
+
+		<mysql-connector-version>5.1.47</mysql-connector-version>
+		<swagger-spring-boot-starter.version>1.8.0.RELEASE</swagger-spring-boot-starter.version>
+		<mybatis-plus-boot-starter.version>3.1.0</mybatis-plus-boot-starter.version>
+		<redisson-spring-boot-starter.version>3.10.7</redisson-spring-boot-starter.version>
+		<expect-common.version>2.1.5</expect-common.version>
+		<expect-sso.version>2.1.5</expect-sso.version>
+		<ip2region.version>0.0.1</ip2region.version>
+	</properties>
+
+	<dependencies>
+		<!-- JUnit test dependency -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- spring boot 监控 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>com.baomidou</groupId>
+		    <artifactId>mybatis-plus-boot-starter</artifactId>
+		    <version>${mybatis-plus-boot-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.expect.common</groupId>
+			<artifactId>expect-common</artifactId>
+			<version>${expect-common.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.expect.sso</groupId>
+			<artifactId>expect-sso</artifactId>
+			<version>${expect-sso.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql-connector-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.expect.redisson</groupId>
+			<artifactId>redisson-spring-boot-starter</artifactId>
+			<version>${redisson-spring-boot-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.spring4all</groupId>
+			<artifactId>swagger-spring-boot-starter</artifactId>
+			<version>${swagger-spring-boot-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.expect.ip2region</groupId>
+			<artifactId>ip2region-spring-boot-starter</artifactId>
+			<version>${ip2region.version}</version>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>Nexus Repository</name>
+			<url>http://112.94.2.30:18081/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus</id>
+			<name>Team Nexus Repository</name>
+			<url>http://112.94.2.30:18081/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+</project>

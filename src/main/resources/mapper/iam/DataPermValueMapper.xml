@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.DataPermValueMapper">
+
+    <select id="listDataPermValuePage" resultType="com.expect.csip.iam.domain.DataPermValue">
+        SELECT
+            P.NAME DATA_PERM_NAME,
+            P.SORT_NUMBER,
+            P.IS_ENABLE,
+            P.DESCR,
+            V.DATA_PERM_ID,
+            V.NAME,
+            V.DATA_PERM_VALUE_ID,
+            V.CONDITION_EXPRESSION,
+            V.CREATED_BY,
+            V.CREATION_DATE,
+            V.LAST_UPDATED_BY,
+            V.LAST_UPDATE_DATE
+        FROM
+            TIA_DATA_PERM P,
+            TIA_DATA_PERM_VALUE V
+        WHERE
+            P.DATA_PERM_ID = V.DATA_PERM_ID
+        AND P.IS_ENABLE = '1'
+        <if test="condition.menuId != null and condition.menuId != ''">
+            AND EXISTS (
+                SELECT
+                    1
+                FROM
+                    TIA_MENU_DATA_PERM_REL R
+                WHERE
+                    R.DATA_PERM_ID = V.DATA_PERM_ID
+                AND R.MENU_ID = #{condition.menuId}
+            )
+        </if>
+        ORDER BY P.SORT_NUMBER ASC
+    </select>
+</mapper>

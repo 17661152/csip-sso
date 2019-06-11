@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.integrated.mapper.SystemServiceMapper">
+
+
+    <select id="listSystemServicePage" resultType="com.expect.csip.integrated.domain.SystemService">
+        SELECT
+            A.SYSTEM_ID,
+            A.CODE,
+            A.NAME,
+            A.ACCESS_ADDRESS,
+            A.DESCR,
+            A.CREATE_PERSON,
+            A.CREATE_TIME,
+            A.LAST_UPDATE_PERSON,
+            A.LAST_UPDATE_TIME
+        FROM
+            TIC_SYSTEM_SERVICE A
+        WHERE
+            1 = 1
+        <if test="condition.name != null and condition.name != ''">
+            AND A.NAME LIKE CONCAT('%',#{condition.name},'%')
+        </if>
+        <if test="condition.code != null and condition.code != ''">
+            AND A.CODE LIKE CONCAT('%',#{condition.code},'%')
+        </if>
+        <if test="condition.accessAddress != null and condition.accessAddress != ''">
+            AND A.ACCESS_ADDRESS LIKE CONCAT('%',#{condition.accessAddress},'%')
+        </if>
+    </select>
+</mapper>

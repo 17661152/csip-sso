@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.DataPermMapper">
+
+    <select id="listDataPermPage" resultType="com.expect.csip.iam.domain.DataPerm">
+        SELECT
+            P.DATA_PERM_ID,
+            P.NAME,
+            P.SORT_NUMBER,
+            P.IS_ENABLE,
+            P.DESCR,
+            P.CREATE_PERSON,
+            P.CREATE_TIME,
+            P.LAST_UPDATE_PERSON,
+            P.LAST_UPDATE_TIME,
+            S.NAME SERVICE_NAME
+        FROM
+            TIA_DATA_PERM P
+        INNER JOIN TIA_SERVICE S ON S.SERVICE_ID = P.DATA_PERM_ID
+        WHERE 1 = 1
+        <if test="condition.name != null and condition.name != ''">
+            AND P.NAME LIKE CONCAT('%',#{condition.name},'%')
+        </if>
+        <if test="condition.isEnable != null and condition.isEnable != ''">
+            AND P.IS_ENABLE = #{condition.isEnable}
+        </if>
+        <if test="condition.serviceName != null and condition.serviceName != ''">
+            AND S.NAME LIKE CONCAT('%',#{condition.serviceName},'%')
+        </if>
+        ORDER BY
+            P.SORT_NUMBER ASC
+    </select>
+</mapper>

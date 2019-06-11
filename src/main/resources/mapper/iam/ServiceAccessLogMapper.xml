@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.expect.csip.iam.mapper.ServiceAccessLogMapper">
+
+    <select id="listServiceAccessLogPage" resultType="com.expect.csip.iam.domain.ServiceAccessLog">
+        SELECT
+            A.LOG_ID,
+            A.USER_ID,
+            A.SERVICE_ID,
+            A.ACCESS_TIME,
+            A.TARGET_ADDRESS,
+            A.SOURCE_IP,
+            A.BROWSER,
+            A.OS,
+            A.BROWSER_VERSION,
+            A.PLATFORM,
+            B.LOGIN_NAME,
+            B.NAME USER_NAME
+        FROM
+            TIA_SERVICE_ACCESS_LOG A
+        LEFT JOIN TIA_USER B ON B.USER_ID = A.USER_ID
+        WHERE
+            1 = 1
+        <if test="condition.loginName != null and condition.loginName != ''">
+            AND U.LOGIN_NAME LIKE CONCAT('%',#{condition.loginName},'%')
+        </if>
+        <if test="condition.userName != null and condition.userName != ''">
+            AND U.NAME LIKE CONCAT('%',#{condition.userName},'%')
+        </if>
+        <if test="condition.targetAddress != null and condition.targetAddress != ''">
+            AND A.TARGET_ADDRESS LIKE CONCAT('%',#{condition.targetAddress},'%')
+        </if>
+        <if test="condition.serviceId != null and condition.serviceId != ''">
+            AND A.SERVICE_ID LIKE CONCAT('%',#{condition.serviceId},'%')
+        </if>
+        <if test="condition.startAccessTime != null and condition.startAccessTime != ''">
+            AND A.ACCESS_TIME &gt;= CONCAT(#{condition.startAccessTime},' 00:00:00')
+        </if>
+        <if test="condition.endAccessTime != null and condition.endAccessTime != ''">
+            AND A.ACCESS_TIME &lt;= CONCAT(#{condition.endAccessTime},' 23:59:59')
+        </if>
+        ORDER BY A.ACCESS_TIME DESC
+    </select>
+</mapper>
